@@ -1,6 +1,5 @@
 streamlit
 pandas
-pytesseract
 google-cloud-vision
 Pillow
 openpyxl
