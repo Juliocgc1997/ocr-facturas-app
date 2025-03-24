@@ -1,17 +1,13 @@
 import os
 import re
 import pandas as pd
-import pytesseract
 from PIL import Image
 from io import BytesIO
 from google.cloud import vision
 from google.oauth2 import service_account
 import streamlit as st
 
-# ================= CONFIG =================
-pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # Ajustar si se usa local
-
-# Google Vision config (usá secretos en Streamlit Cloud)
+# ================= CONFIG GOOGLE VISION =================
 clave_json = st.secrets["GCP_KEY"]
 credenciales = service_account.Credentials.from_service_account_info(clave_json)
 cliente_vision = vision.ImageAnnotatorClient(credentials=credenciales)
@@ -28,12 +24,12 @@ def ocr_google_vision(imagen_bytes):
 def extraer_datos(texto):
     nombre = re.findall(r"Villafane.*Antonella", texto, re.IGNORECASE)
     acompanante = re.findall(r"Gonzales.*Cesar", texto, re.IGNORECASE)
-    comprobante = re.findall(r"(?:Scontrino Fiscale|Numero)[^\d]*(\d+)", texto, re.IGNORECASE)
-    fecha = re.findall(r"\d{2}/\d{2}/\d{4}", texto)
-    servicio = re.findall(r"Perno[a-zA-Z\s]+(?:TRIPLA|DOPPIA|SINGOLA)?", texto, re.IGNORECASE)
+    comprobante = re.findall(r"(?:Scontrino Fiscale|Numero)[^\\d]*(\\d+)", texto, re.IGNORECASE)
+    fecha = re.findall(r"\\d{2}/\\d{2}/\\d{4}", texto)
+    servicio = re.findall(r"Perno[a-zA-Z\\s]+(?:TRIPLA|DOPPIA|SINGOLA)?", texto, re.IGNORECASE)
     pago = re.findall(r"POS|ONLINE|CONTANTI", texto, re.IGNORECASE)
-    subtotal = re.findall(r"(\d{2},\d{2})\s*€", texto)
-    total = re.findall(r"(\d{2},\d{2})\s*€\s*$", texto, re.MULTILINE)
+    subtotal = re.findall(r"(\\d{2},\\d{2})\\s*€", texto)
+    total = re.findall(r"(\\d{2},\\d{2})\\s*€\\s*$", texto, re.MULTILINE)
 
     subtotal_val = subtotal[0] if subtotal else ""
     total_val = total[0] if total else ""
