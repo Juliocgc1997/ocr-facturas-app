@@ -19,11 +19,22 @@ cliente_vision = vision.ImageAnnotatorClient(credentials=credenciales)
 
 # ============== FUNCIONES OCR ==============
 def ocr_google_vision(imagen_bytes):
-    image = vision.Image(content=imagen_bytes)
-    response = cliente_vision.text_detection(image=image)
-    if response.text_annotations:
-        return response.text_annotations[0].description.strip()
-    return ""
+    try:
+        image = vision.Image(content=imagen_bytes)
+        response = cliente_vision.text_detection(image=image)
+
+        if response.error.message:
+            st.error(f"🛑 Error en Google Vision: {response.error.message}")
+            return ""
+
+        if response.text_annotations:
+            return response.text_annotations[0].description.strip()
+
+        return ""
+
+    except Exception as e:
+        st.exception(f"❌ Error procesando la imagen: {e}")
+        return ""
 
 # ============== EXTRACCIÓN DE DATOS ==============
 def extraer_datos(texto):
