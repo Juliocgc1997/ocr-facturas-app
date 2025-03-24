@@ -1,5 +1,0 @@
-streamlit
-pandas
-google-cloud-vision==3.4.5
-Pillow
-openpyxl
