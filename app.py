@@ -12,8 +12,9 @@ import streamlit as st
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # Ajustar si se usa local
 
 # Google Vision config (usá secretos en Streamlit Cloud)
-clave_json = st.secrets["GCP_KEY"]
-credenciales = service_account.Credentials.from_service_account_info(clave_json)
+from google.oauth2 import service_account
+
+credenciales = service_account.Credentials.from_service_account_file("clave1.json")
 cliente_vision = vision.ImageAnnotatorClient(credentials=credenciales)
 
 # ============== FUNCIONES OCR ==============
