@@ -1,5 +1,5 @@
-streamlit
-pandas
-google-cloud-vision
-Pillow
-openpyxl
+streamlit==1.32.0
+pandas==2.2.1
+google-cloud-vision==3.4.5
+Pillow==10.2.0
+openpyxl==3.1.2
