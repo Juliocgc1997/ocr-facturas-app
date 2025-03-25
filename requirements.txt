@@ -1,6 +1,6 @@
-streamlit==1.32.0
-pandas==2.2.1
-google-cloud-vision==3.5.3
-google-auth==2.29.0
-Pillow==10.2.0
-openpyxl==3.1.2
+streamlit
+pandas
+google-cloud-vision
+google-auth
+Pillow
+openpyxl
