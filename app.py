@@ -8,15 +8,15 @@ from google.cloud import vision
 from google.oauth2 import service_account
 import streamlit as st
 
-# ================= CONFIG =================
-pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # Ajustar si se usa local
+# ================= CONFIGURACIÓN =================
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # Solo necesario si usás pytesseract local
 
-# Google Vision config (leyendo desde st.secrets)
+# Google Vision config (leyendo desde secrets en Streamlit Cloud)
 clave_json = st.secrets["GCP_KEY"]
 credenciales = service_account.Credentials.from_service_account_info(clave_json)
 cliente_vision = vision.ImageAnnotatorClient(credentials=credenciales)
 
-# ============== FUNCIONES OCR ==============
+# ================= FUNCIONES OCR =================
 def ocr_google_vision(imagen_bytes):
     try:
         image = vision.Image(content=imagen_bytes)
@@ -32,10 +32,11 @@ def ocr_google_vision(imagen_bytes):
         return ""
 
     except Exception as e:
-        st.exception(f"❌ Error procesando la imagen: {e}")
+        st.error("❌ Error procesando la imagen.")
+        st.exception(e)
         return ""
 
-# ============== EXTRACCIÓN DE DATOS ==============
+# ============ EXTRACCIÓN DE DATOS =============
 def extraer_datos(texto):
     nombre = re.findall(r"Villafane.*Antonella", texto, re.IGNORECASE)
     acompanante = re.findall(r"Gonzales.*Cesar", texto, re.IGNORECASE)
@@ -49,6 +50,7 @@ def extraer_datos(texto):
     subtotal_val = subtotal[0] if subtotal else ""
     total_val = total[0] if total else ""
     iva_val = ""
+
     try:
         if subtotal_val and total_val:
             sub = float(subtotal_val.replace(",", "."))
@@ -71,7 +73,7 @@ def extraer_datos(texto):
         "Texto completo": texto[:1000]
     }
 
-# ============== INTERFAZ STREAMLIT ==============
+# ============= INTERFAZ STREAMLIT =============
 st.set_page_config(page_title="OCR Express", layout="centered")
 st.title("🧾 OCR Express para Facturas")
 st.caption("Subí tus imágenes o PDFs y obtené los datos automáticamente")
@@ -89,4 +91,12 @@ if archivos:
         registros.append(datos)
 
     df = pd.DataFrame(registros)
-    st.success
+    st.success(f"{len(registros)} factura(s) procesadas correctamente ✅")
+    st.dataframe(df)
+
+    # Botón para descargar el Excel
+    excel_bytes = BytesIO()
+    df.to_excel(excel_bytes, index=False)
+    st.download_button("📥 Descargar Excel", data=excel_bytes.getvalue(), file_name="facturas_extraidas.xlsx")
+else:
+    st.info("🔍 Esperando que subas archivos de factura...")
