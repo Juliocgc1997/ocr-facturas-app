@@ -11,10 +11,9 @@ import streamlit as st
 # ================= CONFIG =================
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # Ajustar si se usa local
 
-# Google Vision config (usá secretos en Streamlit Cloud)
-from google.oauth2 import service_account
-
-credenciales = service_account.Credentials.from_service_account_file("clave_vision.json")
+# Google Vision config (leyendo desde st.secrets)
+clave_json = st.secrets["GCP_KEY"]
+credenciales = service_account.Credentials.from_service_account_info(clave_json)
 cliente_vision = vision.ImageAnnotatorClient(credentials=credenciales)
 
 # ============== FUNCIONES OCR ==============
@@ -90,11 +89,4 @@ if archivos:
         registros.append(datos)
 
     df = pd.DataFrame(registros)
-    st.success(f"{len(registros)} factura(s) procesadas.")
-    st.dataframe(df)
-
-    excel_bytes = BytesIO()
-    df.to_excel(excel_bytes, index=False)
-    st.download_button("📥 Descargar Excel", data=excel_bytes.getvalue(), file_name="facturas_extraidas.xlsx")
-else:
-    st.info("Esperando archivos...")
+    st.success
